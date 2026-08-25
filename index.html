@@ -229,6 +229,15 @@
     font-size: clamp(3.5rem, 14vw, 9rem);
     animation: revealPop 0.5s cubic-bezier(.2,1.4,.4,1);
   }
+  /* Your Choice!: two icons side by side so the kid can point at one,
+     in place of the single centered reveal-icon. */
+  .reveal-choice{
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 6vw;
+  }
+  .reveal-choice.active{ display: flex; }
   .reveal-label{
     margin-top: 1.5vh;
     font-size: clamp(2.6rem, 9vw, 7.5rem);
@@ -402,6 +411,10 @@
   <!-- 4. REVEAL -->
   <div id="screen-reveal" class="screen">
     <div id="reveal-icon" class="reveal-icon"></div>
+    <div id="reveal-choice" class="reveal-choice">
+      <span class="reveal-icon family-candy">🍬</span>
+      <span class="reveal-icon family-potato">🥔</span>
+    </div>
     <div id="reveal-label" class="reveal-label"></div>
   </div>
 
@@ -426,8 +439,9 @@ const CONFIG = {
   // sounds, and confetti all read from this list automatically, keyed
   // off each outcome's `tier` (normal / double / jackpot).
   OUTCOMES: [
-    { id: 'candy',        label: 'CANDY!',         tier: 'normal',  family: 'candy',  icon: '🍬',      weight: 40 },
-    { id: 'potato',       label: 'POTATO!',        tier: 'normal',  family: 'potato', icon: '🥔',      weight: 40 },
+    { id: 'candy',        label: 'CANDY!',         tier: 'normal',  family: 'candy',  icon: '🍬',      weight: 35 },
+    { id: 'potato',       label: 'POTATO!',        tier: 'normal',  family: 'potato', icon: '🥔',      weight: 35 },
+    { id: 'yourChoice',   label: 'YOUR CHOICE!',   tier: 'double',  family: 'choice', icon: '🍬🥔',    weight: 10 },
     { id: 'doubleCandy',  label: 'DOUBLE CANDY!',  tier: 'double',  family: 'candy',  icon: '🍬🍬',    weight: 8  },
     { id: 'doublePotato', label: 'DOUBLE POTATO!', tier: 'double',  family: 'potato', icon: '🥔🥔',    weight: 8  },
     { id: 'both',         label: 'BOTH!!',         tier: 'jackpot', family: 'both',   icon: '🍬🎉🥔',  weight: 4  },
@@ -461,6 +475,7 @@ const els = {
   reelWindow:   $('reel-window'),
   reelTrack:    $('reel-track'),
   revealIcon:   $('reveal-icon'),
+  revealChoice: $('reveal-choice'),
   revealLabel:  $('reveal-label'),
   flash:        $('flash-overlay'),
   confetti:     $('confetti-container'),
@@ -832,8 +847,12 @@ function showResult(outcome){
 
 function renderResult(outcome){
   const classes = `tier-${outcome.tier} family-${outcome.family}`;
-  els.revealIcon.textContent = outcome.icon;
-  els.revealIcon.className = 'reveal-icon ' + classes;
+  const isChoice = outcome.id === 'yourChoice';
+
+  els.revealIcon.textContent = isChoice ? '' : outcome.icon;
+  els.revealIcon.className = 'reveal-icon' + (isChoice ? '' : ' ' + classes);
+  els.revealChoice.classList.toggle('active', isChoice);
+
   els.revealLabel.textContent = outcome.label;
   els.revealLabel.className = 'reveal-label ' + classes;
 }

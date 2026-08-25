@@ -1,7 +1,9 @@
 # 🎃 Candy or Potato?!
 
-A haunted arcade cabinet for your front porch. One big button, one spooky
+A haunted game for your front porch. One big button, one spooky
 slot machine, and a kid's fate decided in a 2.5-second spin.
+
+Connect your device (computer, Raspberry Pi etc), plug in a USB button and connect to a giant screen!
 
 Built for trick-or-treaters who mash buttons and don't read instructions —
 so there aren't any. Tap the screen once to wake it up, then it just sits

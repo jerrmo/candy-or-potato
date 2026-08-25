@@ -935,7 +935,7 @@ function initIdleDecor(){
   for (let i = 0; i < 6; i++){
     const b = document.createElement('div');
     b.className = 'bat';
-    b.textContent = '🦇';
+    b.textContent = Math.random() < 0.5 ? '🍬' : '🥔';
     b.style.top = (5 + Math.random() * 55) + '%';
     b.style.fontSize = (1.6 + Math.random() * 1.6) + 'rem';
     b.style.animationDuration = (9 + Math.random() * 8) + 's';

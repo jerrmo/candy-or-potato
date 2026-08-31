@@ -34,7 +34,7 @@ All the odds are configurable — see below.
 
 - **Every sound is generated in code.** No audio files — oscillators, filtered
   noise bursts, and a "boioioing" pitch-bend all built live with the Web Audio
-  API. Even the flickering-lightbulb ambience and the idle drone.
+  API. Even the flickering-lightbulb ambience.
 - **The winner is picked before the reel even starts spinning**, then the
   animation eases toward it — so the tick sounds and the landing position are
   always perfectly in sync, no matter how long the reel spins.

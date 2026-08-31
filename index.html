@@ -507,7 +507,6 @@ function easeOutQuint(t){ return 1 - Math.pow(1 - t, 5); }
    ===================================================================== */
 const SFX = (() => {
   let ctx = null;
-  let ambient = null; // { o1, o2, lfo, g } while idle drone is running
   const vol = CONFIG.MASTER_VOLUME;
 
   function ctxNow(){
@@ -686,39 +685,7 @@ const SFX = (() => {
     noiseHit(0.40, 0.5, 'highpass', 5000, 0.22);
   }
 
-  function startAmbient(){
-    const c = ctxNow();
-    if (!c || ambient) return;
-    const o1 = c.createOscillator();
-    const o2 = c.createOscillator();
-    o1.type = 'sine'; o1.frequency.value = 55;
-    o2.type = 'sine'; o2.frequency.value = 58; // slight detune -> eerie beating
-    const g = c.createGain();
-    g.gain.value = 0.0001;
-    g.gain.linearRampToValueAtTime(0.03 * vol, c.currentTime + 1.2);
-    const lfo = c.createOscillator();
-    lfo.frequency.value = 0.12;
-    const lfoGain = c.createGain();
-    lfoGain.gain.value = 0.012 * vol;
-    lfo.connect(lfoGain).connect(g.gain);
-    o1.connect(g); o2.connect(g); g.connect(c.destination);
-    o1.start(); o2.start(); lfo.start();
-    ambient = { o1, o2, lfo, g };
-  }
-
-  function stopAmbient(){
-    const c = ctxNow();
-    if (!c || !ambient) return;
-    const { o1, o2, lfo, g } = ambient;
-    const t = c.currentTime;
-    g.gain.cancelScheduledValues(t);
-    g.gain.setValueAtTime(g.gain.value, t);
-    g.gain.linearRampToValueAtTime(0.0001, t + 0.4);
-    setTimeout(() => { o1.stop(); o2.stop(); lfo.stop(); }, 450);
-    ambient = null;
-  }
-
-  return { unlock, tick, revealCandy, revealPotato, revealDoubleCandy, revealDoublePotato, revealBoth, startAmbient, stopAmbient };
+  return { unlock, tick, revealCandy, revealPotato, revealDoubleCandy, revealDoublePotato, revealBoth };
 })();
 
 /* =====================================================================
@@ -746,7 +713,6 @@ function startNight(){
 function goIdle(){
   state = 'idle';
   showScreen('idle');
-  SFX.startAmbient();
 }
 
 function isAcceptedKey(e){
@@ -766,7 +732,6 @@ function onKeyDown(e){
 
 function beginSpin(){
   state = 'spin';
-  SFX.stopAmbient();
   showScreen('spin');
 
   const winner = pickWeightedOutcome(); // chosen UP FRONT, animation just gets there

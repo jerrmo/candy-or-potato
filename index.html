@@ -604,7 +604,8 @@ const SFX = (() => {
     freqs.forEach((f) => brass(f, startOffset, duration, gainEach));
   }
 
-  // Comedic pitch-bending "boioioing" — the potato sound effect.
+  // Comedic pitch-bending "boioioing" — the potato sound effect. Bends
+  // UP into the hit, same as a game-show win, not down like a letdown.
   function boing(startOffset, startFreq, endFreq, duration, gain){
     const c = ctxNow();
     if (!c) return;
@@ -656,9 +657,9 @@ const SFX = (() => {
     noiseHit(0.24, 0.25, 'highpass', 3200, 0.14);
   }
 
-  function revealPotato(){ // normal — a single comedic boing
-    boing(0, 260, 120, 0.32, 0.30);
-    noiseHit(0.28, 0.12, 'lowpass', 220, 0.22);
+  function revealPotato(){ // normal — a single comedic boing, played as a win
+    boing(0, 140, 280, 0.28, 0.30);
+    noiseHit(0.22, 0.16, 'highpass', 3000, 0.16);
   }
 
   function revealDoubleCandy(){ // double — bigger sparkling chord run

@@ -22,7 +22,7 @@ there glowing in the dark until someone hits the button.
 | Outcome | Odds | What happens |
 |---|---|---|
 | 🍬 Candy | 35% | The good outcome, plain and simple |
-| 🥔 Potato | 35% | The bit. A single sad comedic *boing*. |
+| 🥔 Potato | 35% | Also a good outcome — a cheerful comedic *boing*, not a letdown |
 | 🍬🥔 Your Choice! | 10% | Candy **and** potato appear side by side — kid points at the one they want |
 | 🍬🍬 Double Candy | 8% | Bigger fanfare, sparkly text, some confetti |
 | 🥔🥔 Double Potato | 8% | Two boings, screen shake, bouncing potato confetti — the goofiest outcome |

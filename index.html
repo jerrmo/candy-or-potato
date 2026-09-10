@@ -428,14 +428,22 @@ const CONFIG = {
 
   // Weights are relative, not percentages, so they don't have to add up
   // to 100. Odds of an outcome are its weight over the total.
+  // `potatoes` is how many that outcome can cost you, which is what
+  // POTATO_BUDGET below counts down. Your Choice counts as 1 because the
+  // kid might take the potato.
   OUTCOMES: [
-    { id: 'candy',        label: 'CANDY!',         tier: 'normal',  family: 'candy',  icon: '🍬',      weight: 35 },
-    { id: 'potato',       label: 'POTATO!',        tier: 'normal',  family: 'potato', icon: '🥔',      weight: 35 },
-    { id: 'yourChoice',   label: 'YOUR CHOICE!',   tier: 'double',  family: 'choice', icon: '🍬🥔',    weight: 10 },
-    { id: 'doubleCandy',  label: 'DOUBLE CANDY!',  tier: 'double',  family: 'candy',  icon: '🍬🍬',    weight: 8  },
-    { id: 'doublePotato', label: 'DOUBLE POTATO!', tier: 'double',  family: 'potato', icon: '🥔🥔',    weight: 8  },
-    { id: 'both',         label: 'BOTH!!',         tier: 'jackpot', family: 'both',   icon: '🍬🎉🥔',  weight: 4  },
+    { id: 'candy',        label: 'CANDY!',         tier: 'normal',  family: 'candy',  icon: '🍬',      weight: 52, potatoes: 0 },
+    { id: 'potato',       label: 'POTATO!',        tier: 'normal',  family: 'potato', icon: '🥔',      weight: 16, potatoes: 1 },
+    { id: 'yourChoice',   label: 'YOUR CHOICE!',   tier: 'double',  family: 'choice', icon: '🍬🥔',    weight: 12, potatoes: 1 },
+    { id: 'doubleCandy',  label: 'DOUBLE CANDY!',  tier: 'double',  family: 'candy',  icon: '🍬🍬',    weight: 12, potatoes: 0 },
+    { id: 'doublePotato', label: 'DOUBLE POTATO!', tier: 'double',  family: 'potato', icon: '🥔🥔',    weight: 4,  potatoes: 2 },
+    { id: 'both',         label: 'BOTH!!',         tier: 'jackpot', family: 'both',   icon: '🍬🎉🥔',  weight: 4,  potatoes: 1 },
   ],
+
+  // How many potatoes you actually bought. Once they're gone, potato
+  // outcomes drop off the reel and the rest of the night runs candy
+  // only. Set to null for no limit. Reloading the page starts it over.
+  POTATO_BUDGET: 150,
 
   // null accepts any key, since the button's HID encoder can be set to
   // send whatever. Use ['Enter'] or similar to restrict it.
@@ -466,19 +474,30 @@ const els = {
   confetti:     $('confetti-container'),
 };
 
+let potatoesLeft = CONFIG.POTATO_BUDGET;
+
+// Anything we can still afford. Once one potato is left, Double Potato
+// bows out on its own but a plain potato is still fair game.
+function availableOutcomes(){
+  if (potatoesLeft === null) return CONFIG.OUTCOMES;
+  return CONFIG.OUTCOMES.filter((o) => o.potatoes <= potatoesLeft);
+}
+
 function pickWeightedOutcome(){
-  const total = CONFIG.OUTCOMES.reduce((sum, o) => sum + o.weight, 0);
+  const pool = availableOutcomes();
+  const total = pool.reduce((sum, o) => sum + o.weight, 0);
   let r = Math.random() * total;
-  for (const o of CONFIG.OUTCOMES){
+  for (const o of pool){
     if (r < o.weight) return o;
     r -= o.weight;
   }
-  return CONFIG.OUTCOMES[CONFIG.OUTCOMES.length - 1]; // float-rounding fallback
+  return pool[pool.length - 1]; // float-rounding fallback
 }
 
 // Just the labels that fly past mid-spin, not the winner.
 function randomOutcome(){
-  return CONFIG.OUTCOMES[Math.floor(Math.random() * CONFIG.OUTCOMES.length)];
+  const pool = availableOutcomes();
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function easeOutQuint(t){ return 1 - Math.pow(1 - t, 5); }
@@ -710,6 +729,8 @@ function beginSpin(){
   showScreen('spin');
 
   const winner = pickWeightedOutcome(); // decided here, the reel just drives to it
+  if (potatoesLeft !== null) potatoesLeft -= winner.potatoes;
+
   const items = buildReelStrip(winner);
   renderReelItems(items);
 

@@ -30,7 +30,7 @@
     font-family: 'Arial Black', 'Segoe UI Black', 'Helvetica Neue', system-ui, sans-serif;
     -webkit-user-select: none;
     user-select: none;
-    cursor: none; /* kiosk display across the room — no mouse pointer clutter */
+    cursor: none; /* kiosk display, no pointer clutter */
   }
 
   #screen-start{ cursor: pointer; }
@@ -44,7 +44,7 @@
       radial-gradient(ellipse at 50% 30%, var(--bg-2) 0%, var(--bg-1) 45%, var(--bg-0) 100%);
   }
 
-  /* ---------- vignette / flicker ambience, always present ---------- */
+  /* vignette + flicker */
   #vignette{
     position: fixed;
     inset: 0;
@@ -61,7 +61,7 @@
     75%      { opacity: 1; }
   }
 
-  /* ---------- generic screen handling ---------- */
+  /* screens */
   .screen{
     position: absolute;
     inset: 0;
@@ -75,7 +75,7 @@
   }
   .screen.active{ display: flex; }
 
-  /* ---------- START screen ---------- */
+  /* start */
   #screen-start .pumpkin-big{
     font-size: clamp(5rem, 16vw, 12rem);
     animation: bob 2.4s ease-in-out infinite;
@@ -102,7 +102,7 @@
     50%      { transform: translateY(-14px) rotate(2deg); }
   }
 
-  /* ---------- IDLE screen ---------- */
+  /* idle */
   #idle-decor{
     position: absolute;
     inset: 0;
@@ -110,8 +110,8 @@
     pointer-events: none;
     overflow: hidden;
   }
-  .bat, .ghost{ position: absolute; will-change: transform, opacity; }
-  .bat{ animation-name: flyAcross; animation-timing-function: linear; animation-iteration-count: infinite; opacity: 0.85; }
+  .drifter, .ghost{ position: absolute; will-change: transform, opacity; }
+  .drifter{ animation-name: flyAcross; animation-timing-function: linear; animation-iteration-count: infinite; opacity: 0.85; }
   .ghost{ animation-name: floatGhost; animation-timing-function: ease-in-out; animation-iteration-count: infinite; opacity: 0.55; }
   @keyframes flyAcross{
     from { transform: translateX(-10vw) translateY(0); }
@@ -162,7 +162,7 @@
     letter-spacing: 0.02em;
   }
 
-  /* ---------- SPIN screen ---------- */
+  /* spin */
   .spin-title{
     font-size: clamp(1.2rem, 3vw, 2rem);
     letter-spacing: 0.5em;
@@ -224,13 +224,12 @@
     z-index: 2;
   }
 
-  /* ---------- REVEAL screen ---------- */
+  /* reveal */
   .reveal-icon{
     font-size: clamp(3.5rem, 14vw, 9rem);
     animation: revealPop 0.5s cubic-bezier(.2,1.4,.4,1);
   }
-  /* Your Choice!: two icons side by side so the kid can point at one,
-     in place of the single centered reveal-icon. */
+  /* two icons side by side so the kid can point at one */
   .reveal-choice{
     display: none;
     align-items: center;
@@ -268,7 +267,7 @@
     100% { background-position: 400% 50%; }
   }
 
-  /* Family-specific personality: candy sparkles, potato wobbles. */
+  /* candy sparkles, potato wobbles */
   .reveal-icon.family-potato, .reveal-label.family-potato{
     animation: revealPop 0.5s cubic-bezier(.2,1.4,.4,1), potatoWobble 0.7s ease-in-out 0.5s 2;
   }
@@ -279,8 +278,7 @@
     75%      { transform: scale(1.05,0.95) rotate(-2deg); }
   }
 
-  /* Double Potato: the goofiest outcome — exaggerated squash & stretch,
-     overriding the plain potato wobble above with something bigger. */
+  /* bigger squash and stretch, overrides the plain wobble above */
   .reveal-icon.tier-double.family-potato, .reveal-label.tier-double.family-potato{
     animation: revealPop 0.5s cubic-bezier(.2,1.4,.4,1), potatoWobbleBig 0.55s ease-in-out 0.4s 5;
   }
@@ -292,7 +290,7 @@
     80%      { transform: scale(0.88,1.12) rotate(4deg); }
   }
 
-  /* Double Candy: elegant twinkle rather than a wobble, for contrast */
+  /* twinkle instead of a wobble */
   .reveal-label.tier-double.family-candy{
     animation: revealPop 0.5s cubic-bezier(.2,1.4,.4,1), candySparkle 0.5s ease-in-out 0.5s 4;
   }
@@ -301,7 +299,7 @@
     50%      { text-shadow: 0 0 60px rgba(255,200,80,1), 0 0 130px rgba(255,120,0,0.85), 0 0 10px #fff; }
   }
 
-  /* Screen shake, triggered only for the Double Potato reveal */
+  /* double potato only */
   #app.shake{ animation: screenShake 0.5s ease-in-out; }
   @keyframes screenShake{
     0%, 100% { transform: translate(0,0) rotate(0deg); }
@@ -316,7 +314,7 @@
     90%      { transform: translate(-1px,0); }
   }
 
-  /* ---------- flash overlay ---------- */
+  /* flash */
   #flash-overlay{
     position: fixed;
     inset: 0;
@@ -338,7 +336,7 @@
     100% { opacity: 0; }
   }
 
-  /* ---------- confetti ---------- */
+  /* confetti */
   #confetti-container{
     position: fixed;
     inset: 0;
@@ -382,14 +380,14 @@
 <div id="app">
   <div id="vignette"></div>
 
-  <!-- 1. START — one click unlocks audio + fullscreen, then never needed again -->
+  <!-- start: one click unlocks audio and fullscreen for the night -->
   <div id="screen-start" class="screen active">
     <div class="pumpkin-big">🎃</div>
     <h1>CANDY or POTATO?!</h1>
     <p>Tap anywhere to start the night</p>
   </div>
 
-  <!-- 2. IDLE / attract screen -->
+  <!-- idle / attract -->
   <div id="screen-idle" class="screen">
     <div id="idle-decor"></div>
     <div class="idle-pumpkin">🎃</div>
@@ -397,7 +395,7 @@
     <div class="idle-sub">🍬 candy&nbsp;&nbsp;·&nbsp;&nbsp;🥔 potato</div>
   </div>
 
-  <!-- 3. SPIN — weighted winner picked up front, reel animates to it -->
+  <!-- spin -->
   <div id="screen-spin" class="screen">
     <div class="spin-title">SPINNING</div>
     <div id="reel-window">
@@ -408,7 +406,7 @@
     </div>
   </div>
 
-  <!-- 4. REVEAL -->
+  <!-- reveal -->
   <div id="screen-reveal" class="screen">
     <div id="reveal-icon" class="reveal-icon"></div>
     <div id="reveal-choice" class="reveal-choice">
@@ -425,19 +423,11 @@
 <script>
 "use strict";
 
-/* =====================================================================
-   CONFIG — the only place you should need to touch mid-evening.
-   Edit a value below and reload the page (F5) to apply it. No build
-   step, nothing else to run — just save the file and hit reload.
-   ===================================================================== */
+// Everything tunable lives here. Edit a value and reload.
 const CONFIG = {
 
-  // Possible outcomes. `weight` is RELATIVE, not a percentage — the
-  // numbers don't need to add up to 100 or anything in particular. A
-  // kid's odds of getting outcome X are simply weight(X) / sum(all
-  // weights). Add, remove, rename, or retune outcomes freely; the reel,
-  // sounds, and confetti all read from this list automatically, keyed
-  // off each outcome's `tier` (normal / double / jackpot).
+  // Weights are relative, not percentages, so they don't have to add up
+  // to 100. Odds of an outcome are its weight over the total.
   OUTCOMES: [
     { id: 'candy',        label: 'CANDY!',         tier: 'normal',  family: 'candy',  icon: '🍬',      weight: 35 },
     { id: 'potato',       label: 'POTATO!',        tier: 'normal',  family: 'potato', icon: '🥔',      weight: 35 },
@@ -447,23 +437,18 @@ const CONFIG = {
     { id: 'both',         label: 'BOTH!!',         tier: 'jackpot', family: 'both',   icon: '🍬🎉🥔',  weight: 4  },
   ],
 
-  // Key(s) that trigger a spin while idle. Leave null (or an empty
-  // array) to accept ANY key — handy since the arcade button's USB HID
-  // encoder can be configured to send whatever key is easiest. Set e.g.
-  // ['Enter'] or [' ', 'Enter'] to restrict to specific keys instead.
+  // null accepts any key, since the button's HID encoder can be set to
+  // send whatever. Use ['Enter'] or similar to restrict it.
   ACCEPTED_KEYS: null,
 
   SPIN_DURATION_MS: 2500,             // how long the reel spins before landing
   RESULT_HOLD_MS: 3000,               // how long the result stays up before auto-reset
   REEL_VISIBLE_ROWS: 3,               // rows visible in the slot-machine window
 
-  MASTER_VOLUME: 0.8,                 // 0–1, quick way to turn the whole night up/down
+  MASTER_VOLUME: 0.8,                 // 0 to 1
   REQUEST_FULLSCREEN_ON_START: true,  // best-effort fullscreen on the opening tap
 };
 
-/* =====================================================================
-   DOM references
-   ===================================================================== */
 const $ = (id) => document.getElementById(id);
 const els = {
   app:          $('app'),
@@ -481,9 +466,6 @@ const els = {
   confetti:     $('confetti-container'),
 };
 
-/* =====================================================================
-   Weighted random selection
-   ===================================================================== */
 function pickWeightedOutcome(){
   const total = CONFIG.OUTCOMES.reduce((sum, o) => sum + o.weight, 0);
   let r = Math.random() * total;
@@ -494,17 +476,14 @@ function pickWeightedOutcome(){
   return CONFIG.OUTCOMES[CONFIG.OUTCOMES.length - 1]; // float-rounding fallback
 }
 
-// Used only for the cosmetic labels that fly by mid-spin — NOT for
-// picking the winner, so it's plain uniform random rather than weighted.
+// Just the labels that fly past mid-spin, not the winner.
 function randomOutcome(){
   return CONFIG.OUTCOMES[Math.floor(Math.random() * CONFIG.OUTCOMES.length)];
 }
 
 function easeOutQuint(t){ return 1 - Math.pow(1 - t, 5); }
 
-/* =====================================================================
-   Audio engine — everything procedural via Web Audio, zero asset files
-   ===================================================================== */
+// All the audio is synthesized here. No sound files.
 const SFX = (() => {
   let ctx = null;
   const vol = CONFIG.MASTER_VOLUME;
@@ -517,7 +496,7 @@ const SFX = (() => {
     return ctx;
   }
 
-  // Call from the start-screen click — the one user gesture we get.
+  // Browsers need a user gesture, so this runs on the start-screen click.
   function unlock(){
     const c = ctxNow();
     if (!c) return;
@@ -530,8 +509,7 @@ const SFX = (() => {
     o.stop(c.currentTime + 0.05);
   }
 
-  // Shared noise-burst helper — a short burst of filtered white noise.
-  // 'lowpass' => thud/plop, 'highpass' => shimmer/sparkle.
+  // Filtered noise burst. lowpass for a thud, highpass for a sparkle.
   function noiseHit(startOffset, duration, filterType, freq, gain, q){
     const c = ctxNow();
     if (!c) return;
@@ -540,7 +518,7 @@ const SFX = (() => {
     const buffer = c.createBuffer(1, size, c.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < size; i++){
-      data[i] = (Math.random() * 2 - 1) * (1 - i / size); // white noise, linear decay
+      data[i] = (Math.random() * 2 - 1) * (1 - i / size);
     }
     const src = c.createBufferSource();
     src.buffer = buffer;
@@ -569,8 +547,8 @@ const SFX = (() => {
     o.stop(t + 0.07);
   }
 
-  // "Brass" voice: two slightly-detuned sawtooths through a filter that
-  // swells open on attack, for a fanfare-horn character.
+  // Fake horn: two detuned sawtooths through a filter that swells open
+  // on the attack.
   function brass(freq, startOffset, duration, gain){
     const c = ctxNow();
     if (!c) return;
@@ -580,7 +558,7 @@ const SFX = (() => {
     o1.type = 'sawtooth'; o2.type = 'sawtooth';
     o1.frequency.setValueAtTime(freq, t);
     o2.frequency.setValueAtTime(freq, t);
-    o2.detune.setValueAtTime(9, t); // thickens the tone
+    o2.detune.setValueAtTime(9, t);
 
     const filter = c.createBiquadFilter();
     filter.type = 'lowpass';
@@ -604,8 +582,8 @@ const SFX = (() => {
     freqs.forEach((f) => brass(f, startOffset, duration, gainEach));
   }
 
-  // Comedic pitch-bending "boioioing" — the potato sound effect. Bends
-  // UP into the hit, same as a game-show win, not down like a letdown.
+  // The potato "boioioing". Bend it upward and it lands like a win
+  // instead of a letdown.
   function boing(startOffset, startFreq, endFreq, duration, gain){
     const c = ctxNow();
     if (!c) return;
@@ -616,7 +594,7 @@ const SFX = (() => {
     o.frequency.exponentialRampToValueAtTime(endFreq, t + duration);
 
     const lfo = c.createOscillator();
-    lfo.frequency.value = 18; // silly wobble
+    lfo.frequency.value = 18;
     const lfoGain = c.createGain();
     lfoGain.gain.value = startFreq * 0.15;
     lfo.connect(lfoGain).connect(o.frequency);
@@ -631,7 +609,7 @@ const SFX = (() => {
     o.stop(t + duration + 0.05); lfo.stop(t + duration + 0.05);
   }
 
-  // Low timpani-style hit for the jackpot finale.
+  // Low drum hit for the jackpot.
   function timpani(startOffset, duration, gain){
     const c = ctxNow();
     if (!c) return;
@@ -648,39 +626,39 @@ const SFX = (() => {
     o.stop(t + duration + 0.05);
   }
 
-  // ---- Per-outcome fanfares, scaled up in size/drama with rarity ----
+  // Fanfares, scaled up with rarity.
 
-  function revealCandy(){ // normal — short & sparkly
+  function revealCandy(){ // short and sparkly
     brass(523.25, 0, 0.16, 0.26);      // C5
     brass(659.25, 0.12, 0.16, 0.26);   // E5
     brass(783.99, 0.24, 0.32, 0.30);   // G5, sustained
     noiseHit(0.24, 0.25, 'highpass', 3200, 0.14);
   }
 
-  function revealPotato(){ // normal — a single comedic boing, played as a win
+  function revealPotato(){ // one boing, played as a win
     boing(0, 140, 280, 0.28, 0.30);
     noiseHit(0.22, 0.16, 'highpass', 3000, 0.16);
   }
 
-  function revealDoubleCandy(){ // double — bigger sparkling chord run
+  function revealDoubleCandy(){ // bigger chord run
     brassChord([392.00, 523.25], 0, 0.20, 0.20);             // G4+C5
     brassChord([523.25, 659.25], 0.16, 0.20, 0.22);          // C5+E5
     brassChord([659.25, 783.99, 1046.50], 0.32, 0.55, 0.26); // E5+G5+C6 sustain
     noiseHit(0.34, 0.4, 'highpass', 4200, 0.20);
   }
 
-  function revealDoublePotato(){ // double — TWO boings, sillier and louder
+  function revealDoublePotato(){ // two boings, sillier and louder
     boing(0, 240, 100, 0.28, 0.30);
     boing(0.26, 280, 110, 0.28, 0.32);
     noiseHit(0.28, 0.14, 'lowpass', 200, 0.26);
     noiseHit(0.56, 0.18, 'lowpass', 170, 0.30);
   }
 
-  function revealBoth(){ // jackpot — full fanfare, with a wink to both prizes
+  function revealBoth(){ // the works
     brassChord([523.25, 659.25, 783.99], 0, 0.20, 0.22);
     brassChord([659.25, 783.99, 1046.50], 0.18, 0.20, 0.24);
     brassChord([783.99, 1046.50, 1318.51], 0.36, 0.70, 0.30); // big finale chord
-    boing(0.06, 320, 170, 0.15, 0.10); // cheeky little potato underneath
+    boing(0.06, 320, 170, 0.15, 0.10); // potato hiding under the fanfare
     timpani(0.36, 0.5, 0.32);
     noiseHit(0.36, 0.3, 'lowpass', 150, 0.28);
     noiseHit(0.40, 0.5, 'highpass', 5000, 0.22);
@@ -689,11 +667,8 @@ const SFX = (() => {
   return { unlock, tick, revealCandy, revealPotato, revealDoubleCandy, revealDoublePotato, revealBoth };
 })();
 
-/* =====================================================================
-   State machine: 'start' | 'idle' | 'spin' | 'reveal'
-   Input is only ever accepted while state === 'idle' — that's the hard
-   lock the mash-happy trick-or-treaters need.
-   ===================================================================== */
+// 'start' | 'idle' | 'spin' | 'reveal'. Input only counts while idle,
+// otherwise button mashing interrupts the spin.
 let state = 'start';
 
 function showScreen(name){
@@ -719,14 +694,13 @@ function goIdle(){
 function isAcceptedKey(e){
   const keys = CONFIG.ACCEPTED_KEYS;
   if (keys && keys.length) return keys.includes(e.key);
-  // "any key" — but ignore bare modifier taps, which are almost
-  // certainly not the arcade button and would false-trigger a spin.
+  // Any key, except bare modifier taps, which aren't the button.
   const modifiers = ['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Tab'];
   return !modifiers.includes(e.key);
 }
 
 function onKeyDown(e){
-  if (state !== 'idle') return; // hard lock: ignore everything mid-spin/reveal
+  if (state !== 'idle') return;
   if (!isAcceptedKey(e)) return;
   beginSpin();
 }
@@ -735,7 +709,7 @@ function beginSpin(){
   state = 'spin';
   showScreen('spin');
 
-  const winner = pickWeightedOutcome(); // chosen UP FRONT, animation just gets there
+  const winner = pickWeightedOutcome(); // decided here, the reel just drives to it
   const items = buildReelStrip(winner);
   renderReelItems(items);
 
@@ -753,9 +727,9 @@ function beginSpin(){
 
 function buildReelStrip(winner){
   const items = [];
-  const spinCount = 22 + Math.floor(Math.random() * 6); // a bit of variety spin-to-spin
+  const spinCount = 22 + Math.floor(Math.random() * 6); // some variety spin to spin
   for (let i = 0; i < spinCount; i++) items.push(randomOutcome());
-  items.push(winner); // guaranteed final item — this is what the reel lands on
+  items.push(winner); // always last, so the reel lands on it
   return items;
 }
 
@@ -766,9 +740,9 @@ function renderReelItems(items){
   els.reelTrack.style.transform = 'translateY(0px)';
 }
 
-// Winner index is fixed before this runs; we just ease a virtual
-// "current index" up to it and translate the strip to match, so ticks
-// (via onTick) and the visual landing are always perfectly in sync.
+// Eases a virtual index up to finalIndex and moves the strip to match.
+// Ticking off that same index is what keeps the sound and the landing
+// in sync regardless of spin length.
 function animateReel({ finalIndex, itemHeight, duration, onTick, onDone }){
   const start = performance.now();
   let lastIndex = -1;
@@ -778,7 +752,7 @@ function animateReel({ finalIndex, itemHeight, duration, onTick, onDone }){
     const t = Math.min(1, (now - start) / duration);
     const eased = easeOutQuint(t);
     const i = finalIndex * eased;
-    const y = itemHeight - i * itemHeight; // centers item i in the middle row
+    const y = itemHeight - i * itemHeight;
     els.reelTrack.style.transform = `translateY(${y}px)`;
 
     const idx = Math.min(finalIndex, Math.floor(i));
@@ -833,10 +807,7 @@ function playRevealSound(outcome){
   }
 }
 
-// Modest reveal for candy/potato, bigger for doubles, full
-// confetti-and-fanfare treatment for the BOTH! jackpot tier. Double
-// Potato gets its own goofier treatment (screen shake + bouncing potato
-// confetti) so it reads as funnier than Double Candy's elegant sparkle.
+// Confetti only from the double tier up, so the jackpot still feels big.
 function celebrate(outcome){
   flashScreen(outcome.tier);
   if (outcome.id === 'both'){
@@ -852,7 +823,7 @@ function celebrate(outcome){
 function shakeScreen(){
   const el = els.app;
   el.classList.remove('shake');
-  void el.offsetWidth; // force reflow so the animation restarts every time
+  void el.offsetWidth; // reflow, or the animation won't restart
   el.classList.add('shake');
   setTimeout(() => el.classList.remove('shake'), 550);
 }
@@ -864,8 +835,8 @@ function clearCelebration(){
 
 function flashScreen(tier){
   const el = els.flash;
-  el.className = ''; // reset...
-  void el.offsetWidth; // ...and force reflow so the animation restarts every time
+  el.className = '';
+  void el.offsetWidth; // reflow, or the animation won't restart
   el.classList.add('flash-' + (tier === 'jackpot' ? 'jackpot' : tier === 'double' ? 'double' : 'normal'));
 }
 
@@ -900,7 +871,7 @@ function launchConfetti(count, opts){
 function initIdleDecor(){
   for (let i = 0; i < 6; i++){
     const b = document.createElement('div');
-    b.className = 'bat';
+    b.className = 'drifter';
     b.textContent = Math.random() < 0.5 ? '🍬' : '🥔';
     b.style.top = (5 + Math.random() * 55) + '%';
     b.style.fontSize = (1.6 + Math.random() * 1.6) + 'rem';
@@ -921,9 +892,6 @@ function initIdleDecor(){
   }
 }
 
-/* =====================================================================
-   Wire it up
-   ===================================================================== */
 els.screenStart.addEventListener('click', startNight, { once: true });
 window.addEventListener('keydown', onKeyDown);
 initIdleDecor();

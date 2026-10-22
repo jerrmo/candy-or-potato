@@ -33,9 +33,15 @@ All the odds are configurable, see below.
 
 ## How many potatoes to buy
 
-A potato shows up on 36% of spins, but it only costs you one when the kid
-actually takes it. Averaged out that's about **a third of a potato per kid**,
-so figure 110 for 300 kids or 170 for 500.
+A potato shows up on 36% of spins, and the counter charges you for every one
+of those, Your Choice included, because it can't know whether the kid will
+point at the potato or the candy. That works out to **0.4 potatoes per kid**,
+so figure 120 for 300 kids or 200 for 500.
+
+Buy against that number, not against what ends up in kids' hands. You'll hand
+out fewer than the counter spends, closer to a third per kid, so expect to
+finish the night with some potatoes still in the bucket. That's the price of
+never promising one you don't have.
 
 You don't have to guess exactly right, though. Set `POTATO_BUDGET` to however
 many you actually bought and the game counts them down as it goes. Once

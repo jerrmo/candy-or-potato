@@ -347,9 +347,8 @@
   .confetti-piece{
     position: absolute;
     top: -20px;
-    width: 12px;
-    height: 18px;
     opacity: 0.95;
+    line-height: 1;
     animation-name: confettiFall;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
@@ -357,12 +356,6 @@
   @keyframes confettiFall{
     0%   { transform: translateY(-5vh) translateX(0) rotate(0deg); opacity: 1; }
     100% { transform: translateY(112vh) translateX(var(--drift)) rotate(var(--rot)); opacity: 0.85; }
-  }
-  .confetti-piece.confetti-emoji{
-    width: auto;
-    height: auto;
-    background: none !important;
-    line-height: 1;
   }
   .confetti-piece.confetti-potato{ animation-name: potatoDrop; }
   @keyframes potatoDrop{
@@ -451,7 +444,7 @@ const CONFIG = {
 
   SPIN_DURATION_MS: 2500,             // how long the reel spins before landing
   RESULT_HOLD_MS: 3000,               // how long the result stays up before auto-reset
-  REEL_VISIBLE_ROWS: 3,               // rows visible in the slot-machine window
+  REEL_VISIBLE_ROWS: 3,               // rows visible in the slot-machine window, keep it odd
 
   MASTER_VOLUME: 0.8,                 // 0 to 1
   REQUEST_FULLSCREEN_ON_START: true,  // best-effort fullscreen on the opening tap
@@ -720,11 +713,13 @@ function isAcceptedKey(e){
 
 function onKeyDown(e){
   if (state !== 'idle') return;
+  if (e.repeat) return; // a held-down button would re-spin the moment we go idle
   if (!isAcceptedKey(e)) return;
   beginSpin();
 }
 
 function beginSpin(){
+  SFX.unlock(); // audio suspends if the display sleeps; a keypress is a gesture, so resume is allowed
   state = 'spin';
   showScreen('spin');
 
@@ -766,6 +761,8 @@ function renderReelItems(items){
 // in sync regardless of spin length.
 function animateReel({ finalIndex, itemHeight, duration, onTick, onDone }){
   const start = performance.now();
+  // Lands the winner in the highlighted middle row. Keep the row count odd.
+  const centerOffset = itemHeight * Math.floor(CONFIG.REEL_VISIBLE_ROWS / 2);
   let lastIndex = -1;
   let lastTickAt = 0;
 
@@ -773,7 +770,7 @@ function animateReel({ finalIndex, itemHeight, duration, onTick, onDone }){
     const t = Math.min(1, (now - start) / duration);
     const eased = easeOutQuint(t);
     const i = finalIndex * eased;
-    const y = itemHeight - i * itemHeight;
+    const y = centerOffset - i * itemHeight;
     els.reelTrack.style.transform = `translateY(${y}px)`;
 
     const idx = Math.min(finalIndex, Math.floor(i));
@@ -786,7 +783,7 @@ function animateReel({ finalIndex, itemHeight, duration, onTick, onDone }){
     if (t < 1){
       requestAnimationFrame(frame);
     } else {
-      els.reelTrack.style.transform = `translateY(${itemHeight - finalIndex * itemHeight}px)`;
+      els.reelTrack.style.transform = `translateY(${centerOffset - finalIndex * itemHeight}px)`;
       onDone();
     }
   }
@@ -800,10 +797,8 @@ function showResult(outcome){
   playRevealSound(outcome);
   celebrate(outcome);
 
-  setTimeout(() => {
-    clearCelebration();
-    goIdle();
-  }, CONFIG.RESULT_HOLD_MS);
+  // Confetti outlives the hold and removes itself, so it falls into the idle screen.
+  setTimeout(goIdle, CONFIG.RESULT_HOLD_MS);
 }
 
 function renderResult(outcome){
@@ -849,11 +844,6 @@ function shakeScreen(){
   setTimeout(() => el.classList.remove('shake'), 550);
 }
 
-function clearCelebration(){
-  els.confetti.innerHTML = '';
-  els.flash.className = '';
-}
-
 function flashScreen(tier){
   const el = els.flash;
   el.className = '';
@@ -861,22 +851,13 @@ function flashScreen(tier){
   el.classList.add('flash-' + (tier === 'jackpot' ? 'jackpot' : tier === 'double' ? 'double' : 'normal'));
 }
 
-const CONFETTI_COLORS = ['#ff7518', '#ffd700', '#9b5cff', '#39ff14', '#ff2fb0', '#fdf3d8'];
-
-function launchConfetti(count, opts){
-  opts = opts || {};
-  const emojis = opts.emojis;
-  const dropClass = opts.drop === 'potato' ? ' confetti-potato' : '';
+function launchConfetti(count, { emojis, drop }){
+  const dropClass = drop === 'potato' ? ' confetti-potato' : '';
   for (let i = 0; i < count; i++){
     const p = document.createElement('div');
     p.className = 'confetti-piece' + dropClass;
-    if (emojis && emojis.length){
-      p.classList.add('confetti-emoji');
-      p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      p.style.fontSize = (1.2 + Math.random() * 1.6) + 'rem';
-    } else {
-      p.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
-    }
+    p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    p.style.fontSize = (1.2 + Math.random() * 1.6) + 'rem';
     p.style.left = (Math.random() * 100) + 'vw';
     const duration = 2.4 + Math.random() * 2.2;
     const delay = Math.random() * 0.5;
@@ -912,6 +893,23 @@ function initIdleDecor(){
     els.idleDecor.appendChild(g);
   }
 }
+
+// The one rule with real money behind it: never offer a potato we can't pay for. Load with #selftest.
+function selfTest(){
+  const saved = potatoesLeft;
+  for (let night = 0; night < 500; night++){
+    potatoesLeft = night % 7; // every small budget, including none left
+    for (let spin = 0; spin < 40; spin++){
+      const o = pickWeightedOutcome();
+      console.assert(o && o.potatoes <= potatoesLeft, 'offered a potato we do not have');
+      potatoesLeft -= o.potatoes;
+      console.assert(potatoesLeft >= 0, 'budget went negative');
+    }
+  }
+  potatoesLeft = saved;
+  console.log('selftest: budget rule held');
+}
+if (location.hash === '#selftest') selfTest();
 
 els.screenStart.addEventListener('click', startNight, { once: true });
 window.addEventListener('keydown', onKeyDown);

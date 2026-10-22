@@ -447,7 +447,6 @@ const CONFIG = {
   REEL_VISIBLE_ROWS: 3,               // rows visible in the slot-machine window, keep it odd
 
   MASTER_VOLUME: 0.8,                 // 0 to 1
-  REQUEST_FULLSCREEN_ON_START: true,  // best-effort fullscreen on the opening tap
 };
 
 const $ = (id) => document.getElementById(id);
@@ -473,7 +472,9 @@ let potatoesLeft = CONFIG.POTATO_BUDGET;
 // bows out on its own but a plain potato is still fair game.
 function availableOutcomes(){
   if (potatoesLeft === null) return CONFIG.OUTCOMES;
-  return CONFIG.OUTCOMES.filter((o) => o.potatoes <= potatoesLeft);
+  const pool = CONFIG.OUTCOMES.filter((o) => o.potatoes <= potatoesLeft);
+  // Only reachable if every outcome costs potatoes. An over-promise beats a frozen screen.
+  return pool.length ? pool : CONFIG.OUTCOMES;
 }
 
 function pickWeightedOutcome(){
@@ -522,7 +523,7 @@ const SFX = (() => {
   }
 
   // Filtered noise burst. lowpass for a thud, highpass for a sparkle.
-  function noiseHit(startOffset, duration, filterType, freq, gain, q){
+  function noiseHit(startOffset, duration, filterType, freq, gain){
     const c = ctxNow();
     if (!c) return;
     const t = c.currentTime + startOffset;
@@ -537,7 +538,7 @@ const SFX = (() => {
     const filter = c.createBiquadFilter();
     filter.type = filterType;
     filter.frequency.value = freq;
-    filter.Q.value = q || 0.8;
+    filter.Q.value = 0.8;
     const g = c.createGain();
     g.gain.value = gain * vol;
     src.connect(filter).connect(g).connect(c.destination);
@@ -692,7 +693,7 @@ function showScreen(name){
 
 function startNight(){
   SFX.unlock();
-  if (CONFIG.REQUEST_FULLSCREEN_ON_START && document.documentElement.requestFullscreen){
+  if (document.documentElement.requestFullscreen){
     document.documentElement.requestFullscreen().catch(() => {});
   }
   goIdle();
@@ -736,7 +737,7 @@ function beginSpin(){
     finalIndex: items.length - 1,
     itemHeight,
     duration: CONFIG.SPIN_DURATION_MS,
-    onTick: () => SFX.tick(),
+    onTick: SFX.tick,
     onDone: () => showResult(winner),
   });
 }
@@ -777,15 +778,11 @@ function animateReel({ finalIndex, itemHeight, duration, onTick, onDone }){
     if (idx !== lastIndex && now - lastTickAt > 24){
       lastIndex = idx;
       lastTickAt = now;
-      onTick(idx);
+      onTick();
     }
 
-    if (t < 1){
-      requestAnimationFrame(frame);
-    } else {
-      els.reelTrack.style.transform = `translateY(${centerOffset - finalIndex * itemHeight}px)`;
-      onDone();
-    }
+    if (t < 1) requestAnimationFrame(frame);
+    else onDone(); // the frame above already wrote the landing position
   }
   requestAnimationFrame(frame);
 }
